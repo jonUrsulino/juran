@@ -91,8 +91,7 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
     });
   }
 
-  Widget _changeBody() {
-    /*
+  Widget _buildBody() {
     final List<FadeTransition> transitions = <FadeTransition>[];
 
     for (NavigationIconView view in _navigationViews)
@@ -104,13 +103,11 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
       double bValue = b.animation.value;
       return aValue.compareTo(bValue);
     });
-    */
-    
-    StatefulWidget statefulWidget = new ConnectionScreen(proxies: _kProxies);
 
-
-
-    return statefulWidget;
+    if (_currentIndex == 0)
+      return new ConnectionScreen(proxies: _kProxies);
+    else
+      return new Stack(children: transitions);
   }
 
   @override
@@ -153,7 +150,7 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
                   )
             ],
             ),
-        body: _changeBody(),
+        body: _buildBody(),
         bottomNavigationBar: botNavBar,
         );
   }
