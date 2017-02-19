@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'connection_screen.dart';
 
 void main() {
   runApp(new AppJuran());
@@ -90,7 +91,8 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
     });
   }
 
-  Widget _buildBody() {
+  Widget _changeBody() {
+    /*
     final List<FadeTransition> transitions = <FadeTransition>[];
 
     for (NavigationIconView view in _navigationViews)
@@ -102,8 +104,13 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
       double bValue = b.animation.value;
       return aValue.compareTo(bValue);
     });
+    */
+    
+    StatefulWidget statefulWidget = new ConnectionScreen(proxies: _kProxies);
 
-    return new Stack(children: transitions);
+
+
+    return statefulWidget;
   }
 
   @override
@@ -125,7 +132,7 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
 
     return new Scaffold(
         appBar: new AppBar(
-            title: new Text('Connection'),
+            title: new Text('Juran'),
             actions: <Widget>[
               new PopupMenuButton<BottomNavigationBarType>(
                   onSelected: (BottomNavigationBarType value) {
@@ -146,7 +153,7 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
                   )
             ],
             ),
-        body: _buildBody(),
+        body: _changeBody(),
         bottomNavigationBar: botNavBar,
         );
   }
@@ -204,3 +211,9 @@ class NavigationIconView {
         );
   }
 }
+
+final List<Proxy> _kProxies = <Proxy>[
+  new Proxy(name: 'Charles'),
+  new Proxy(name: 'Squid'),
+  new Proxy(name: 'Mitm'),
+];

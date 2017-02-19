@@ -1,14 +1,8 @@
 
 import 'package:flutter/material.dart';
 
-final List<Proxy> _kProxies = <Proxy>[
-  new Proxy(name: 'Charles'),
-  new Proxy(name: 'Squid'),
-  new Proxy(name: 'Mitm'),
-];
-
-class ProxyList extends StatefulWidget {
-  ProxyList({Key key, this.proxies}) : super(key: key);
+class ConnectionScreen extends StatefulWidget {
+  ConnectionScreen({Key key, this.proxies}) : super(key: key);
 
   final List<Proxy> proxies;
 
@@ -21,7 +15,7 @@ class ProxyList extends StatefulWidget {
   _ProxyListState createState() => new _ProxyListState();
 }
 
-class _ProxyListState extends State<ProxyList> {
+class _ProxyListState extends State<ConnectionScreen> {
   Set<Proxy> _proxyCart = new Set<Proxy>();
 
   void _handleCartChanged(Proxy proxy, bool inCart) {
@@ -40,9 +34,6 @@ class _ProxyListState extends State<ProxyList> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-            title: new Text('Juran'),
-            ),
         body: new MaterialList(
             type: MaterialListType.oneLineWithAvatar,
             children: config.proxies.map((Proxy proxy) {
