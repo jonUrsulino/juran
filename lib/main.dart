@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(new MyApp());
-
+  runApp(new AppJuran());
 }
 
-final List<Proxy> _kProxies = <Proxy>[
-  new Proxy(name: 'Charles'),
-  new Proxy(name: 'Squid'),
-  new Proxy(name: 'Mitm'),
-];
-
-class MyApp extends StatelessWidget {
+class AppJuran extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Juran',
-      theme: new ThemeData(
+        title: 'Juran',
+        theme: new ThemeData(
         // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see
@@ -26,109 +19,188 @@ class MyApp extends StatelessWidget {
         // and press "r" in the console where you ran "flutter run".
         // We call this a "hot reload". Notice that the counter didn't
         // reset back to zero -- the application is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: new ProxyList(proxies: _kProxies),
+            primarySwatch: Colors.blue,
+            ),
+        home: new BottomNavigationHomeScreen(),
 
-    );
+        );
   }
 }
 
-class ProxyList extends StatefulWidget {
-  ProxyList({Key key, this.proxies}) : super(key: key);
-
-  final List<Proxy> proxies;
-
-  // The framework calls createState the first time a widget appears at a given
-  // location in the tree. If the parent rebuilds and uses the same type of
-  // widget (with the same key), the framework will re-use the State object
-  // instead of creating a new State object.
+class BottomNavigationHomeScreen extends StatefulWidget {
+  static const String routeName = '/bottom_navigation';
 
   @override
-  _ProxyListState createState() => new _ProxyListState();
+  _BottomNavigationState createState() => new _BottomNavigationState();
 }
 
-class _ProxyListState extends State<ProxyList> {
-  Set<Proxy> _proxyCart = new Set<Proxy>();
 
-  void _handleCartChanged(Proxy proxy, bool inCart) {
+class _BottomNavigationState extends State<BottomNavigationHomeScreen>
+    with TickerProviderStateMixin {
+  int _currentIndex = 0;
+  BottomNavigationBarType _type = BottomNavigationBarType.shifting;
+  List<NavigationIconView> _navigationViews;
+
+  @override
+  void initState() {
+    super.initState();
+    _navigationViews = <NavigationIconView>[
+      new NavigationIconView(
+          icon: new Icon(Icons.wifi),
+          title: new Text('Connection'),
+          color: Colors.deepPurple[500],
+          vsync: this,
+          ),
+      new NavigationIconView(
+          icon: new Icon(Icons.apps),
+          title: new Text('Betas'),
+          color: Colors.teal[500],
+          vsync: this,
+          ),
+      new NavigationIconView(
+          icon: new Icon(Icons.bug_report),
+          title: new Text('Test'),
+          color: Colors.indigo[500],
+          vsync: this,
+          ),
+      new NavigationIconView(
+          icon: new Icon(Icons.markunread),
+          title: new Text('Logs'),
+          color: Colors.pink[500],
+          vsync: this,
+          )
+    ];
+
+    for (NavigationIconView view in _navigationViews)
+      view.controller.addListener(_rebuild);
+
+    _navigationViews[_currentIndex].controller.value = 1.0;
+  }
+
+  @override
+  void dispose() {
+    for (NavigationIconView view in _navigationViews)
+      view.controller.dispose();
+    super.dispose();
+  }
+
+  void _rebuild() {
     setState(() {
-      // When user changes what is in the cart, we need to change _proxyCart
-      // inside a setState call to trigger a rebuild. The framework then calls
-      // build, below, which updates the visual appearance of the app.
-
-      if (inCart)
-        _proxyCart.add(proxy);
-      else
-        _proxyCart.remove(proxy);
+      // Rebuild in order to animate views.
     });
   }
 
+  Widget _buildBody() {
+    final List<FadeTransition> transitions = <FadeTransition>[];
+
+    for (NavigationIconView view in _navigationViews)
+      transitions.add(view.transition(_type, context));
+
+    // We want to have the newly animating (fading in) views on top.
+    transitions.sort((FadeTransition a, FadeTransition b) {
+      double aValue = a.animation.value;
+      double bValue = b.animation.value;
+      return aValue.compareTo(bValue);
+    });
+
+    return new Stack(children: transitions);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final BottomNavigationBar botNavBar = new BottomNavigationBar(
+        labels: _navigationViews
+            .map((NavigationIconView navigationView) => navigationView.destinationLabel)
+            .toList(),
+        currentIndex: _currentIndex,
+        type: _type,
+        onTap: (int index) {
+          setState(() {
+            _navigationViews[_currentIndex].controller.reverse();
+            _currentIndex = index;
+            _navigationViews[_currentIndex].controller.forward();
+          });
+        },
+        );
+
     return new Scaffold(
         appBar: new AppBar(
-            title: new Text('Juran'),
+            title: new Text('Connection'),
+            actions: <Widget>[
+              new PopupMenuButton<BottomNavigationBarType>(
+                  onSelected: (BottomNavigationBarType value) {
+                    setState(() {
+                      _type = value;
+                    });
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuItem<BottomNavigationBarType>>[
+                    new PopupMenuItem<BottomNavigationBarType>(
+                        value: BottomNavigationBarType.fixed,
+                        child: new Text('Fixed'),
+                        ),
+                    new PopupMenuItem<BottomNavigationBarType>(
+                        value: BottomNavigationBarType.shifting,
+                        child: new Text('Shifting'),
+                        )
+                  ],
+                  )
+            ],
             ),
-        body: new MaterialList(
-            type: MaterialListType.oneLineWithAvatar,
-            children: config.proxies.map((Proxy proxy) {
-              return new ProxyListItem(
-                  proxy: proxy,
-                  inCart: _proxyCart.contains(proxy),
-                  onCartChanged: _handleCartChanged,
-                  );
-            }),
-            ),
+        body: _buildBody(),
+        bottomNavigationBar: botNavBar,
         );
   }
 }
 
-class Proxy {
-  const Proxy({this.name});
-  final String name;
-}
-
-typedef void CartChangedCallback(Proxy proxy, bool inCart);
-
-class ProxyListItem extends StatelessWidget {
-  ProxyListItem({Proxy proxy, this.inCart, this.onCartChanged})
-      : proxy = proxy,
-        super(key: new ObjectKey(proxy));
-
-  final Proxy proxy;
-  final bool inCart;
-  final CartChangedCallback onCartChanged;
-
-  Color _getColor(BuildContext context) {
-    // The theme depends on the BuildContext because different parts of the tree
-    // can have different themes.  The BuildContext indicates where the build is
-    // taking place and therefore which theme to use.
-
-    return inCart ? Colors.black54 : Theme.of(context).primaryColor;
-  }
-
-  TextStyle _getTextStyle(BuildContext context) {
-    if (!inCart) return null;
-
-    return new TextStyle(
-        color: Colors.black54,
-        decoration: TextDecoration.lineThrough,
-        );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new ListItem(
-        onTap: () {
-          onCartChanged(proxy, !inCart);
-        },
-        leading: new CircleAvatar(
-            backgroundColor: _getColor(context),
-            child: new Text(proxy.name[0]),
+class NavigationIconView {
+  NavigationIconView({
+  Icon icon,
+  Widget title,
+  Color color,
+  TickerProvider vsync,
+  }) : _icon = icon,
+        _color = color,
+        destinationLabel = new DestinationLabel(
+            icon: icon,
+            title: title,
+            backgroundColor: color,
             ),
-        title: new Text(proxy.name, style: _getTextStyle(context)),
+        controller = new AnimationController(
+            duration: kThemeAnimationDuration,
+            vsync: vsync,
+            ) {
+    _animation = new CurvedAnimation(
+        parent: controller,
+        curve: new Interval(0.5, 1.0, curve: Curves.fastOutSlowIn),
+        );
+  }
+
+  final Icon _icon;
+  final Color _color;
+  final DestinationLabel destinationLabel;
+  final AnimationController controller;
+  CurvedAnimation _animation;
+
+  FadeTransition transition(BottomNavigationBarType type, BuildContext context) {
+    Color iconColor;
+    if (type == BottomNavigationBarType.shifting) {
+      iconColor = _color;
+    } else {
+      final ThemeData themeData = Theme.of(context);
+      iconColor = themeData.brightness == Brightness.light
+          ? themeData.primaryColor
+          : themeData.accentColor;
+    }
+
+    return new FadeTransition(
+        opacity: _animation,
+        child: new SlideTransition(
+            position: new Tween<FractionalOffset>(
+                begin: const FractionalOffset(0.0, 0.02), // Small offset from the top.
+                end: FractionalOffset.topLeft,
+                ).animate(_animation),
+            child: new Icon(_icon.icon, color: iconColor, size: 120.0),
+            ),
         );
   }
 }
-
