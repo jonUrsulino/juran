@@ -16,7 +16,7 @@ class ConnectionScreen extends StatefulWidget {
 }
 
 class _ProxyListState extends State<ConnectionScreen> {
-  Proxy _proxyCart = new Proxy();
+  Proxy _proxyCart = new Proxy(name: "Nenhum");
 
   void _handleCartChanged(Proxy proxy, bool inCart) {
     setState(() {
@@ -37,7 +37,7 @@ class _ProxyListState extends State<ConnectionScreen> {
             children: config.proxies.map((Proxy proxy) {
               return new ProxyListItem(
                   proxy: proxy,
-                  inCart: _proxyCart == proxy,
+                  inCart: _proxyCart.name == proxy.name,
                   onCartChanged: _handleCartChanged,
                   );
             }),
