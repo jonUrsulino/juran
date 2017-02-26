@@ -16,7 +16,7 @@ class ConnectionScreen extends StatefulWidget {
 }
 
 class _ProxyListState extends State<ConnectionScreen> {
-  Set<Proxy> _proxyCart = new Set<Proxy>();
+  Proxy _proxyCart = new Proxy();
 
   void _handleCartChanged(Proxy proxy, bool inCart) {
     setState(() {
@@ -24,10 +24,8 @@ class _ProxyListState extends State<ConnectionScreen> {
       // inside a setState call to trigger a rebuild. The framework then calls
       // build, below, which updates the visual appearance of the app.
 
-      if (inCart)
-        _proxyCart.add(proxy);
-      else
-        _proxyCart.remove(proxy);
+      if (!inCart)
+        _proxyCart = proxy;
     });
   }
 
@@ -39,7 +37,7 @@ class _ProxyListState extends State<ConnectionScreen> {
             children: config.proxies.map((Proxy proxy) {
               return new ProxyListItem(
                   proxy: proxy,
-                  inCart: _proxyCart.contains(proxy),
+                  inCart: _proxyCart == proxy,
                   onCartChanged: _handleCartChanged,
                   );
             }),
@@ -69,11 +67,11 @@ class ProxyListItem extends StatelessWidget {
     // can have different themes.  The BuildContext indicates where the build is
     // taking place and therefore which theme to use.
 
-    return inCart ? Colors.black54 : Theme.of(context).primaryColor;
+    return !inCart ? Colors.black54 : Theme.of(context).primaryColor;
   }
 
   TextStyle _getTextStyle(BuildContext context) {
-    if (!inCart) return null;
+    if (inCart) return null;
 
     return new TextStyle(
         color: Colors.black54,
@@ -85,7 +83,7 @@ class ProxyListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return new ListItem(
         onTap: () {
-          onCartChanged(proxy, !inCart);
+          onCartChanged(proxy, inCart);
         },
         leading: new CircleAvatar(
             backgroundColor: _getColor(context),
