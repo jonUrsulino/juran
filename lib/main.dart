@@ -210,6 +210,7 @@ class NavigationIconView {
 }
 
 final List<Proxy> _kProxies = <Proxy>[
+  new Proxy(name: 'Nenhum'),
   new Proxy(name: 'Charles'),
   new Proxy(name: 'Squid'),
   new Proxy(name: 'Mitm'),
