@@ -105,7 +105,10 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
     });
 
     if (_currentIndex == 0)
-      return new ConnectionScreen(wifies: _kWifies, proxies: _kProxies);
+      return new ConnectionScreen(
+          wifies: _kWifies,
+          proxies: _kProxies
+      );
     else
       return new Stack(children: transitions);
   }
@@ -128,28 +131,6 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
         );
 
     return new Scaffold(
-        appBar: new AppBar(
-            title: new Text('Juran'),
-            actions: <Widget>[
-              new PopupMenuButton<BottomNavigationBarType>(
-                  onSelected: (BottomNavigationBarType value) {
-                    setState(() {
-                      _type = value;
-                    });
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuItem<BottomNavigationBarType>>[
-                    new PopupMenuItem<BottomNavigationBarType>(
-                        value: BottomNavigationBarType.fixed,
-                        child: new Text('Fixed'),
-                        ),
-                    new PopupMenuItem<BottomNavigationBarType>(
-                        value: BottomNavigationBarType.shifting,
-                        child: new Text('Shifting'),
-                        )
-                  ],
-                  )
-            ],
-            ),
         body: _buildBody(),
         bottomNavigationBar: botNavBar,
         );
