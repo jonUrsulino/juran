@@ -105,7 +105,7 @@ class _BottomNavigationState extends State<BottomNavigationHomeScreen>
     });
 
     if (_currentIndex == 0)
-      return new ConnectionScreen(proxies: _kProxies);
+      return new ConnectionScreen(wifies: _kWifies, proxies: _kProxies);
     else
       return new Stack(children: transitions);
   }
@@ -214,4 +214,11 @@ final List<Proxy> _kProxies = <Proxy>[
   new Proxy(name: 'Charles'),
   new Proxy(name: 'Squid'),
   new Proxy(name: 'Mitm'),
+];
+
+final List<Proxy> _kWifies = <Proxy>[
+  new Proxy(name: 'Nenhum'),
+  new Proxy(name: 'Jonny'),
+  new Proxy(name: 'Venezia'),
+  new Proxy(name: 'Orochimaru'),
 ];

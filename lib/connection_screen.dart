@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 
 class ConnectionScreen extends StatefulWidget {
-  ConnectionScreen({Key key, this.proxies}) : super(key: key);
+  ConnectionScreen({Key key, this.wifies, this.proxies}) : super(key: key);
 
+  final List<Proxy> wifies;
   final List<Proxy> proxies;
 
   // The framework calls createState the first time a widget appears at a given
